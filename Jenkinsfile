@@ -27,6 +27,21 @@ pipeline{
                 sh "docker rmi -f \$(docker images -q) || date"
             }
         }
+        stage('Update Maven information') {
+            steps {
+                script {
+                    // Update artifacts
+                    sh "python3 scripts/update-maven-information.py --repo-url https://origin-repository.jboss.org/nexus/content/groups/public/"
+
+                    // For debug
+                    sh "cat modules/kogito-data-index/module.yaml"
+                    sh "cat modules/kogito-jobs-service/module.yaml"
+                    sh "cat modules/kogito-management-console/module.yaml"
+                    sh "cat tests/test-apps/clone-repo.sh"
+                    sh "cat ${HOME}/.m2/settings.xml"
+                }
+            }
+        }
         stage('Validate CeKit Image and Modules descriptors'){
             steps {
                 sh """
