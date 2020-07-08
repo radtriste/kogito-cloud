@@ -1,4 +1,5 @@
 // Promote images
+@Library('jenkins-pipeline-shared-libraries')_
 
 IMAGES = ["kogito-quarkus-ubi8", 
                     "kogito-quarkus-jvm-ubi8",
@@ -8,6 +9,9 @@ IMAGES = ["kogito-quarkus-ubi8",
                     "kogito-data-index",
                     "kogito-jobs-service",
                     "kogito-management-console"]
+
+def readProp;
+def version;
 
 pipeline {
     agent {
@@ -32,6 +36,10 @@ pipeline {
         string(name: 'PROMOTE_IMAGE_TAG', defaultValue: '', description: 'Promote image tag')
 
         booleanParam(name: 'DEPLOY_WITH_LATEST_TAG', defaultValue: false, description: 'Set to true if you want the deployed images to also be with the `latest` tag')
+        booleanParam(name: 'RELEASE', defaultValue: false, description: 'To specify that deployment is done for release process')
+        string(name : 'DEPLOY_BUILD_URL', defaultValue: '', description: 'URL to jenkins deploy build to retrieve the deployment.properties file')
+        string(name : 'GIT_TAG' , defaultValue: '' , description : '')
+         
     }
 
     environment {
@@ -83,11 +91,53 @@ pipeline {
                 }
             }
         }
-    }
-    post {
-        always {
-            script {
-                cleanImages()
+        stage('Merge PR')
+        {
+            when {
+                expression {
+                    return params.RELEASE && params.DEPLOY_BUILD_URL != ''
+                }
+            }
+            steps{
+                script {
+                    readProp = readProperties file : 'Deployment.properties'
+
+                    githubscm.mergePR(${readProp['kogito-images.pr.link']})
+                    
+                }
+            }
+        }
+        stage('Git Tag')
+        {
+            when {
+                return params.RELEASE && params.DEPLOY_BUILD_URL != ''
+            }
+            steps {
+                script {
+                        checkout(githubscm,resolveRepository("kogito-runtimes", "kiegroup", env.BRANCH_NAME, false))
+                        githubscm.tagRepository("Kogito-images" , "user@kogito-images")
+                    
+                }
+            }
+        }
+        stage('Snapshot')
+        {
+            when {
+                expression {
+                    return params.RELEASE
+                }
+            }
+            steps {
+                script{
+                   
+                    setNextSnapshot()
+
+                }
+            }
+        }
+        stage('Finishing'){
+            steps{
+                sh "docker rmi -f \$(docker images -q) || date"
             }
         }
     }
@@ -212,6 +262,22 @@ String getNewImageNameSuffix(){
     return params.PROMOTE_IMAGE_NAME_SUFFIX
 }
 
-String getNewImageTag(){
-    return params.PROMOTE_IMAGE_TAG
+String getParam(String keyPrefix, String keyId){
+    return params."${getKey(keyPrefix, keyId)}"
+}
+
+void setNextSnapshot()
+{
+    readProp = readProperties file : 'Deployment.properties'
+
+    version = ${readProp['VERSION']}
+    String delimeter= "\\.\\s*"
+    String [] xyz = version.split(delimeter)
+    int z = Integers.parseInt(xyz[2])
+    z = z + 1
+    xyz[2] = z.toString()
+    String v = xyz[0] + "." + xyz[1] + "." + xyz[2] + "-snapshot"
+    
+    //command to update
+    sh "python manage-kogito-version.py --bump-to v"
 }
