@@ -10,8 +10,8 @@ IMAGES = ["kogito-quarkus-ubi8",
                     "kogito-jobs-service",
                     "kogito-management-console"]
 
-def readProp;
-def version;
+def deployProperties
+
 
 pipeline {
     agent {
@@ -36,7 +36,7 @@ pipeline {
         string(name: 'PROMOTE_IMAGE_TAG', defaultValue: '', description: 'Promote image tag')
 
         booleanParam(name: 'DEPLOY_WITH_LATEST_TAG', defaultValue: false, description: 'Set to true if you want the deployed images to also be with the `latest` tag')
-        booleanParam(name: 'RELEASE', defaultValue: false, description: 'To specify that deployment is done for release process')
+        booleanParam(name: 'RELEASE', defaultValue: false, description: 'Override `deployment.properties`')
         string(name : 'DEPLOY_BUILD_URL', defaultValue: '', description: 'URL to jenkins deploy build to retrieve the deployment.properties file')
         string(name : 'GIT_TAG' , defaultValue: '' , description : '')
          
@@ -56,6 +56,8 @@ pipeline {
 
                     if (params.DISPLAY_NAME != "") {
                         currentBuild.displayName = params.DISPLAY_NAME
+                        readDeployProperties()
+                        params.RELEASE = getRelease("release")
                     }
                 }
             }
@@ -100,10 +102,7 @@ pipeline {
             }
             steps{
                 script {
-                    readProp = readProperties file : 'Deployment.properties'
-
-                    githubscm.mergePR(${readProp['kogito-images.pr.link']})
-                    
+                    githubscm.mergePR(deployProperties['kogito-images.pr.link'])
                 }
             }
         }
@@ -114,9 +113,8 @@ pipeline {
             }
             steps {
                 script {
-                        checkout(githubscm,resolveRepository("kogito-runtimes", "kiegroup", env.BRANCH_NAME, false))
-                        githubscm.tagRepository("Kogito-images" , "user@kogito-images")
-                    
+                    checkout(githubscm,resolveRepository("kogito-images", params.GIT_AUTHOR, params.BUILD_BRANCH_NAME, false))
+                    githubscm.tagRepository("Kogito-images" , "env.GIT_COMMITTER_EMAIL")
                 }
             }
         }
@@ -129,15 +127,9 @@ pipeline {
             }
             steps {
                 script{
-                   
-                    setNextSnapshot()
-
+                   def verison = getVersion("project.version")
+                   sh "python manage-kogito-version.py --bump-to ${utils.getnextSnapshot(version)}"
                 }
-            }
-        }
-        stage('Finishing'){
-            steps{
-                sh "docker rmi -f \$(docker images -q) || date"
             }
         }
     }
@@ -209,7 +201,22 @@ void loginContainerRegistry(String registry, String credsId){
         sh "podman login -u ${REGISTRY_USER} -p ${REGISTRY_PWD} --tls-verify=false ${registry}"
     }
 }
-
+void readDeployProperties(){
+    if(params.DEPLOY_BUILD_URL != null){
+        sh "wget --auth-no-challenge --user=${JENKINS_USER} --password=${JENKINS_TOKEN} ${params.DEPLOY_BUILD_URL}artifact/deployment.properties"
+        deployProperties = readProperties file:"deployment.properties"
+    }
+}
+bool getRelease(String key){
+    if(deployProperties[key] != null){
+        return deployProperties[key] == "true"
+    }
+}
+String getVersion(String key){
+    if(deployProperties[key] != null){
+        return deployProperties[key]
+    }
+}
 ////////////////////////////////////////////////////////////////////////
 // Old image information
 ////////////////////////////////////////////////////////////////////////
@@ -266,18 +273,3 @@ String getParam(String keyPrefix, String keyId){
     return params."${getKey(keyPrefix, keyId)}"
 }
 
-void setNextSnapshot()
-{
-    readProp = readProperties file : 'Deployment.properties'
-
-    version = ${readProp['VERSION']}
-    String delimeter= "\\.\\s*"
-    String [] xyz = version.split(delimeter)
-    int z = Integers.parseInt(xyz[2])
-    z = z + 1
-    xyz[2] = z.toString()
-    String v = xyz[0] + "." + xyz[1] + "." + xyz[2] + "-snapshot"
-    
-    //command to update
-    sh "python manage-kogito-version.py --bump-to v"
-}

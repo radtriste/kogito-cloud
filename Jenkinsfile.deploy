@@ -11,8 +11,8 @@ IMAGES = ["kogito-quarkus-ubi8",
          ]
 
 
-properties = [ : ]
-def to_key_value = ""
+deploy_properties = [ : ]
+
 
 pipeline {
     agent {
@@ -25,26 +25,20 @@ pipeline {
     }
 
     parameters {
-    string(name: 'DISPLAY_NAME', defaultValue: '', description: 'Setup a specific build display name')
-    string(name: 'BUILD_BRANCH_NAME', defaultValue: 'master', description: 'Which branch to build ? Set if you are not on a multibranch pipeline.')
+        string(name: 'DISPLAY_NAME', defaultValue: '', description: 'Setup a specific build display name')
+        string(name: 'BUILD_BRANCH_NAME', defaultValue: 'master', description: 'Which branch to build ? Set if you are not on a multibranch pipeline.')
 
-    string(name: 'IMAGE_REGISTRY_CREDENTIALS', defaultValue: '', description: 'Image registry credentials to use to deploy images. Will be ignored if no IMAGE_REGISTRY is given')
-    string(name: 'IMAGE_REGISTRY', defaultValue: '', description: 'Image registry to use to deploy images')
-    string(name: 'IMAGE_NAMESPACE', defaultValue: 'kiegroup', description: 'Image namespace to use to deploy images')
-    string(name: 'IMAGE_NAME_SUFFIX', defaultValue: '', description: 'Image name suffix to use to deploy images. In case you need to change the final image name, you can add a suffix to it.')
-    string(name: 'IMAGE_TAG', defaultValue: '', description: 'Image tag to use to deploy images')
+        string(name: 'IMAGE_REGISTRY_CREDENTIALS', defaultValue: '', description: 'Image registry credentials to use to deploy images. Will be ignored if no IMAGE_REGISTRY is given')
+        string(name: 'IMAGE_REGISTRY', defaultValue: '', description: 'Image registry to use to deploy images')
+        string(name: 'IMAGE_NAMESPACE', defaultValue: 'kiegroup', description: 'Image namespace to use to deploy images')
+        string(name: 'IMAGE_NAME_SUFFIX', defaultValue: '', description: 'Image name suffix to use to deploy images. In case you need to change the final image name, you can add a suffix to it.')
+        string(name: 'IMAGE_TAG', defaultValue: '', description: 'Image tag to use to deploy images')
 
-    string(name: 'MAVEN_ARTIFACT_REPOSITORY', defaultValue: '', description: 'Maven repository where the build artifacts are present')
+        string(name: 'MAVEN_ARTIFACT_REPOSITORY', defaultValue: '', description: 'Maven repository where the build artifacts are present')
     
-    string(name: 'VERSION', defaultValue: '', description: 'To check version and update it')
-    booleanparam(name: 'RELEASE', defaultValue: 'false', description:'To create PR if it's true')
+        string(name: 'PROJECT_VERSION', defaultValue: '', description: 'To check version and update it')
+        booleanparam(name: 'RELEASE', defaultValue: 'false', description:'To create PR if it's true')
     
-    
-
-    
-
-    }
-
         booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Skip tests')
     }
 
@@ -58,8 +52,7 @@ pipeline {
 
     stages {
         stage('Initialization') {
-            
-            steps {
+               steps {
                 script {  
                     clean()
 
@@ -76,14 +69,17 @@ pipeline {
                         echo "Set Maven mirror url"
                         env.MAVEN_MIRROR_URL = env.MAVEN_MIRROR_REPOSITORY
                     }
-                    if(params.VERSION != '')
-                    {
-                        properties['VERSION'] = params.VERSION
+                    if (params.RELEASE) {
+                        assert params.PROJECT_VERSION != ''
                     }
+                    setDeployPropertyIfneeded('git.branch', params.BUILD_BRANCH_NAME)
+                    setDeployPropertyIfneeded('project.version', params.PROJECT_VERSION)
+                    setDeployPropertyIfneeded('release', params.RELEASE)
+
                 }
             }
         }
-    }
+    
 
         stage('Prepare for PR') {
             when {
@@ -100,17 +96,18 @@ pipeline {
         }
         
         
-        stage('Update Version')
-        {
+        stage('Update Version'){
             when {
                 expression{
-                    return params.VERSION != ''
+                    return params.PROJECT_VERSION != ''
                 }
             }
             steps {
                 script{
-                    
-                    sh "python manage-kogito-version.py --bump-to ${params.VERSION} --confirm"
+                    if(params.BUILD_BRANCH_NAME != 'master'){
+                        sh "python manage-kogito-version.py --bump-to ${params.PROJECT_VERSION} --confirm --apps-branch"
+                    }
+                    sh "python manage-kogito-version.py --bump-to ${params.PROJECT_VERSION} --confirm"
                 }
             }
         }
@@ -132,6 +129,14 @@ pipeline {
                     sh "cat modules/kogito-jobs-service/module.yaml"
                     sh "cat modules/kogito-management-console/module.yaml"
                 }
+            }
+        }
+        stage('Commit Changes'){
+            steps {
+                script {
+                    def COMMIT_MSG = "Update project version to ${params.PROJECT_VERSION}"
+                    githubscm.commitChanges(env.GIT_COMMITTER_NAME , env.GIT_COMMITTER_EMAIL, COMMIT_MSG)    
+                } 
             }
         }
         stage('Setup tests repository') {
@@ -223,12 +228,6 @@ pipeline {
                 }
             }
         }
-        stage('Finishing') {
-            steps {
-                sh "docker rmi -f \$(docker images -q) || date"
-            }
-        }
-
         stage('Create PR')
         {
             when {
@@ -238,28 +237,24 @@ pipeline {
             }
             steps{
                 script{
-                    githubscm.commitChanges(GIT_USER , GIT_USER_EMAIL, COMMIT_MSG, "pom.xml")
                     githubscm.pushObject("origin", NEW_BRANCH , "bsig-gh-bot")
-                    //store it in the properties map
-                    properties["kogito-images.pr.link"]=githubscm.createPR(${params.VERSION}, "bsig-gh-bot")
-                    
-
+                    //store it in the deploy_properties map
+                    deploy_properties["kogito-images.pr.link"]=githubscm.createPR(params.PROJECT_VERSION, "bsig-gh-bot")
                 }
             }
         }
-        //write to properties file 
     }
     post {
         always {
             script{
                 
                 //create properties file with the content from map 
-                to_key_value = properties.collect{ entry -> "${entry.key}=${entry.value}" }.join("\n")
+                def propertiesStr = deploy_properties.collect{ entry -> "${entry.key}=${entry.value}" }.join("\n")
 
-                writeFile( file : 'Deployment.properties' , text : to_key_value)
+                writeFile( file : 'deployment.properties' , text : propertiesStr)
                 
                 //archive it 
-                archiveArtifacts artifacts: 'deploy.properties', allowEmptyArchive:true
+                archiveArtifacts artifacts: 'deployment.properties', allowEmptyArchive:true
                 cleanWorkspaces()
             }
         }
@@ -267,7 +262,7 @@ pipeline {
 }
 
 void clean() {
-    cleanWorkspaces()
+    clean()
     cleanImages()
 
     // Clean Cekit cache, in case we reuse an old node
@@ -317,6 +312,11 @@ void loginContainerRegistry(String registry, String credsId){
     }
 }
 
+void setDeployPropertyIfneeded(String key, def value){
+    if(value != null && value != "") {
+        deploy_properties[key] = value
+    }
+}
 ////////////////////////////////////////////////////////////////////////
 // Deploy image information
 ////////////////////////////////////////////////////////////////////////
