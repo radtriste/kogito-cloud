@@ -36,11 +36,12 @@ pipeline {
         string(name: 'PROMOTE_IMAGE_TAG', defaultValue: '', description: 'Promote image tag')
 
         booleanParam(name: 'DEPLOY_WITH_LATEST_TAG', defaultValue: false, description: 'Set to true if you want the deployed images to also be with the `latest` tag')
-        booleanParam(name: 'RELEASE', defaultValue: false, description: 'Override `deployment.properties`')
-        string(name : 'DEPLOY_BUILD_URL', defaultValue: '', description: 'URL to jenkins deploy build to retrieve the deployment.properties file')
-        string(name : 'GIT_TAG' , defaultValue: '' , description : '')
-        string(name: 'BUILD_BRANCH_NAME', defaultValue: 'master', description: 'Which branch to build ? Set if you are not on a multibranch pipeline.')
-        string(name: 'PROJECT_VERSION', defaultValue: '', description: 'To check version and update it')
+        string(name: 'DEPLOY_BUILD_URL', defaultValue: '', description: 'URL to jenkins deploy build to retrieve the `deployment.properties` file. If base parameters are defined, they will override the `deployment.properties` information')
+        string(name: 'GIT_AUTHOR', defaultValue: 'kiegroup', description: 'Override `deployment.properties`. Which Git author repository ?')
+        string(name: 'BUILD_BRANCH_NAME', defaultValue: 'master', description: 'Override `deployment.properties`. Which branch to build? Set if you are not on a multibranch pipeline.')
+        booleanParam(name: 'RELEASE', defaultValue: false, description: 'Override `deployment.properties`. Is this build for a release?')
+        string(name: 'PROJECT_VERSION', defaultValue: '', description: 'Override `deployment.properties`. Optional if not RELEASE. If RELEASE, cannot be empty.')
+        string(name: 'GIT_TAG', defaultValue: '', description: 'Git tag to set, if different from PROJECT_VERSION')
          
     }
 
@@ -58,6 +59,9 @@ pipeline {
 
                     if (params.DISPLAY_NAME != "") {
                         currentBuild.displayName = params.DISPLAY_NAME
+                    }
+                    if(isRelease()) {
+                        assert getProjectVersion() != ''
                     }
                     readDeployProperties()
                 }
@@ -98,11 +102,12 @@ pipeline {
         {
             when {
                 expression {
-                    return isRelease() && params.DEPLOY_BUILD_URL != ''
+                    return isRelease() && getDeployProperty('kogito-images.pr.link') != ''
                 }
             }
             steps{
                 script {
+                    checkout(githubscm.resolveRepository("kogito-images", getGitAuthor(), getBuildBranchname(), false))
                     githubscm.mergePR(deployProperties['kogito-images.pr.link'])
                 }
             }
@@ -110,13 +115,11 @@ pipeline {
         stage('Git Tag')
         {
             when {
-                return isRelease() && params.DEPLOY_BUILD_URL != ''
+                return isRelease() && getDeployProperty('kogito-images.pr.link') != ''
             }
             steps {
                 script {
-                    checkout(githubscm.resolveRepository("kogito-images", params.GIT_AUTHOR, params.BUILD_BRANCH_NAME, false))
-                    def tagName = getGitTag()
-                    githubscm.tagRepository( tagName, env.BUILD_TAG)
+                    githubscm.tagRepository(getGitTag() , env.BUILD_TAG)
                 }
             }
         }
@@ -205,7 +208,7 @@ void loginContainerRegistry(String registry, String credsId){
 }
 void readDeployProperties(){
     if(params.DEPLOY_BUILD_URL != null){
-        sh "wget --auth-no-challenge --user=${JENKINS_USER} --password=${JENKINS_TOKEN} ${params.DEPLOY_BUILD_URL}artifact/deployment.properties"
+        sh "wget ${params.DEPLOY_BUILD_URL}artifact/deployment.properties"
         deployProperties = readProperties file:"deployment.properties"
         echo deployProperties.collect{ entry -> "${entry.key}=${entry.value}" }.join("\n")
     }
@@ -235,8 +238,11 @@ String getGitTag() {
     return params.GIT_TAG != "" ? params.GIT_TAG : getProjectVersion()
 }
 
-String getBuildBranch() {
+String getBuildBranchName() {
     return getParamOrDeployProperty("BUILD_BRANCH_NAME", "git.branch")
+}
+String getGitAuthor() {
+    return getParamOrDeployProperty("GIT_AUTHOR", "git.author")
 }
 ////////////////////////////////////////////////////////////////////////
 // Old image information
