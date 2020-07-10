@@ -52,7 +52,7 @@ pipeline {
 
     stages {
         stage('Initialization') {
-               steps {
+            steps {
                 script {  
                     clean()
 
@@ -105,7 +105,7 @@ pipeline {
             steps {
                 script{
                     if(params.BUILD_BRANCH_NAME != 'master'){
-                        sh "python manage-kogito-version.py --bump-to ${params.PROJECT_VERSION} --confirm --apps-branch"
+                        sh "python manage-kogito-version.py --bump-to ${params.PROJECT_VERSION} --confirm --apps-branch ${params.BUILD_BRANCH_NAME}"
                     }
                     sh "python manage-kogito-version.py --bump-to ${params.PROJECT_VERSION} --confirm"
                 }
@@ -247,22 +247,19 @@ pipeline {
     post {
         always {
             script{
-                
                 //create properties file with the content from map 
                 def propertiesStr = deploy_properties.collect{ entry -> "${entry.key}=${entry.value}" }.join("\n")
-
                 writeFile( file : 'deployment.properties' , text : propertiesStr)
-                
                 //archive it 
                 archiveArtifacts artifacts: 'deployment.properties', allowEmptyArchive:true
-                cleanWorkspaces()
+                clean()
             }
         }
     }
 }
 
 void clean() {
-    clean()
+    cleanWorkspaces()
     cleanImages()
 
     // Clean Cekit cache, in case we reuse an old node

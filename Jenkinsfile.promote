@@ -10,7 +10,7 @@ IMAGES = ["kogito-quarkus-ubi8",
                     "kogito-jobs-service",
                     "kogito-management-console"]
 
-def deployProperties
+deployProperties
 
 
 pipeline {
@@ -39,6 +39,8 @@ pipeline {
         booleanParam(name: 'RELEASE', defaultValue: false, description: 'Override `deployment.properties`')
         string(name : 'DEPLOY_BUILD_URL', defaultValue: '', description: 'URL to jenkins deploy build to retrieve the deployment.properties file')
         string(name : 'GIT_TAG' , defaultValue: '' , description : '')
+        string(name: 'BUILD_BRANCH_NAME', defaultValue: 'master', description: 'Which branch to build ? Set if you are not on a multibranch pipeline.')
+        string(name: 'PROJECT_VERSION', defaultValue: '', description: 'To check version and update it')
          
     }
 
@@ -56,9 +58,8 @@ pipeline {
 
                     if (params.DISPLAY_NAME != "") {
                         currentBuild.displayName = params.DISPLAY_NAME
-                        readDeployProperties()
-                        params.RELEASE = getRelease("release")
                     }
+                    readDeployProperties()
                 }
             }
         }
@@ -97,7 +98,7 @@ pipeline {
         {
             when {
                 expression {
-                    return params.RELEASE && params.DEPLOY_BUILD_URL != ''
+                    return isRelease() && params.DEPLOY_BUILD_URL != ''
                 }
             }
             steps{
@@ -109,13 +110,13 @@ pipeline {
         stage('Git Tag')
         {
             when {
-                return params.RELEASE && params.DEPLOY_BUILD_URL != ''
+                return isRelease() && params.DEPLOY_BUILD_URL != ''
             }
             steps {
                 script {
-                    checkout(githubscm,resolveRepository("kogito-images", params.GIT_AUTHOR, params.BUILD_BRANCH_NAME, false))
+                    checkout(githubscm.resolveRepository("kogito-images", params.GIT_AUTHOR, params.BUILD_BRANCH_NAME, false))
                     def tagName = getGitTag()
-                    githubscm.tagRepository( , env.BUILD_TAG)
+                    githubscm.tagRepository( tagName, env.BUILD_TAG)
                 }
             }
         }
@@ -128,7 +129,7 @@ pipeline {
             }
             steps {
                 script{
-                   def verison = getVersion("project.version")
+                   def version = getProjectVersion()
                    sh "python manage-kogito-version.py --bump-to ${utils.getnextSnapshot(version)}"
                 }
             }
@@ -206,20 +207,36 @@ void readDeployProperties(){
     if(params.DEPLOY_BUILD_URL != null){
         sh "wget --auth-no-challenge --user=${JENKINS_USER} --password=${JENKINS_TOKEN} ${params.DEPLOY_BUILD_URL}artifact/deployment.properties"
         deployProperties = readProperties file:"deployment.properties"
+        echo deployProperties.collect{ entry -> "${entry.key}=${entry.value}" }.join("\n")
     }
 }
-bool getRelease(String key){
-    if(deployProperties[key] != null){
-        return deployProperties[key] == "true"
-    }
+boolean hasDeployProperty(String key) {
+    return deployProperties[key] != null
 }
-String getVersion(String key){
-    if(deployProperties[key] != null){
+String getDeployProperty(String key) {
+    if(hasDeployProperty(key)){
         return deployProperties[key]
     }
+    return ""
 }
-String getGitTag(){
-    return params.GIT_TAG != "" ? params.GIT_TAG : getVersion("project.version")
+String getParamOrDeployProperty(String paramKey, String deployPropertyKey) {
+    if (params[paramKey] != "") {
+        return params[paramKey]
+    }
+    return getDeployProperty(deployPropertyKey)
+}
+boolean isRelease() {
+    return params.RELEASE || (getDeployProperty("release") == "true")
+}
+String getProjectVersion() {
+    return getParamOrDeployProperty("PROJECT_VERSION" , "project.version")
+}
+String getGitTag() {
+    return params.GIT_TAG != "" ? params.GIT_TAG : getProjectVersion()
+}
+
+String getBuildBranch() {
+    return getParamOrDeployProperty("BUILD_BRANCH_NAME", "git.branch")
 }
 ////////////////////////////////////////////////////////////////////////
 // Old image information
