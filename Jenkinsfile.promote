@@ -114,7 +114,8 @@ pipeline {
             steps {
                 script {
                     checkout(githubscm,resolveRepository("kogito-images", params.GIT_AUTHOR, params.BUILD_BRANCH_NAME, false))
-                    githubscm.tagRepository("Kogito-images" , "env.GIT_COMMITTER_EMAIL")
+                    def tagName = getGitTag()
+                    githubscm.tagRepository( , env.BUILD_TAG)
                 }
             }
         }
@@ -216,6 +217,9 @@ String getVersion(String key){
     if(deployProperties[key] != null){
         return deployProperties[key]
     }
+}
+String getGitTag(){
+    return params.GIT_TAG != "" ? params.GIT_TAG : getVersion("project.version")
 }
 ////////////////////////////////////////////////////////////////////////
 // Old image information

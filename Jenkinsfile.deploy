@@ -135,7 +135,7 @@ pipeline {
             steps {
                 script {
                     def COMMIT_MSG = "Update project version to ${params.PROJECT_VERSION}"
-                    githubscm.commitChanges(env.GIT_COMMITTER_NAME , env.GIT_COMMITTER_EMAIL, COMMIT_MSG)    
+                    githubscm.commitChanges(COMMIT_MSG)    
                 } 
             }
         }
