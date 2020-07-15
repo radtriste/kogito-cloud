@@ -27,7 +27,7 @@ pipeline {
     parameters {
         string(name: 'DISPLAY_NAME', defaultValue: '', description: 'Setup a specific build display name')
         string(name: 'BUILD_BRANCH_NAME', defaultValue: 'master', description: 'Which branch to build ? Set if you are not on a multibranch pipeline.')
-
+        booleanParam(name: 'IMAGE_USE_OPENSHIFT_REGISTRY', defaultValue: false, description: 'Set to true if image should be deployed in Openshift registry.In this case, IMAGE_REGISTRY_CREDENTIALS, IMAGE_REGISTRY and IMAGE_NAMESPACE parameters will be ignored')
         string(name: 'IMAGE_REGISTRY_CREDENTIALS', defaultValue: '', description: 'Image registry credentials to use to deploy images. Will be ignored if no IMAGE_REGISTRY is given')
         string(name: 'IMAGE_REGISTRY', defaultValue: '', description: 'Image registry to use to deploy images')
         string(name: 'IMAGE_NAMESPACE', defaultValue: 'kiegroup', description: 'Image namespace to use to deploy images')
