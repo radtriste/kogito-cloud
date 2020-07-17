@@ -113,7 +113,7 @@ pipeline {
         {
             when {
                expression {
-                    checkout(githubscm.resolveRepository("kogito-images", getGitAuthor(), getBuildBranchname(), false))
+                    return isRelease() && getDeployProperty('kogito-images.pr.link') != ''
                 }
             }
             steps {
