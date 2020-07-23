@@ -7,4 +7,4 @@ execute:
 
 envs:
   - name: "KOGITO_VERSION"
-    value: "201.0.0"
+    value: "201.0.4"
