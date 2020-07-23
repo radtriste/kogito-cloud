@@ -1,10 +1,10 @@
 schema_version: 1
 name: org.kie.kogito.quarkus.s2i
-version: "201.0.0"
+version: "201.0.1-snapshot"
 
 execute:
   - script: configure
 
 envs:
   - name: "KOGITO_VERSION"
-    value: "201.0.0"
+    value: "201.0.1-snapshot"
