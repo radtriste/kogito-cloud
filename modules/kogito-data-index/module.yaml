@@ -1,6 +1,6 @@
 schema_version: 1
 name: org.kie.kogito.dataindex
-version: "204.0.0"
+version: "204.0.1-snapshot"
 
 artifacts:
   - name: kogito-data-index-runner.jar
