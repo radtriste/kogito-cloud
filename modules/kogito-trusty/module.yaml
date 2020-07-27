@@ -1,11 +1,11 @@
 schema_version: 1
 name: org.kie.kogito.trusty
-version: "0.12.0-rc1"
+version: "204.0.0"
 
 artifacts:
   - name: kogito-trusty-runner.jar
-    url: https://repository.jboss.org/nexus/content/groups/public/org/kie/kogito/trusty-service/8.0.0-SNAPSHOT/trusty-service-8.0.0-20200724.024218-120-runner.jar
-    md5: 279d44ddb3bb603ae1c0b882b098e90a
+    url: http://nexus3-tradisso-release-nexus.apps.playground.rhba.openshift-aws.rhocf-dev.com/repository/runtimes-artifacts/org/kie/kogito/trusty-service/204.0.0/trusty-service-204.0.0-runner.jar
+    md5: 3ef9e0ed0d61a345f68c4511ae37cc16
 
 execute:
   - script: configure
