@@ -4,7 +4,7 @@ version: "205.0.0"
 
 artifacts:
   - name: kogito-explainability-runner.jar
-    url: http://nexus3-tradisso-release-nexus.apps.playground.rhba.openshift-aws.rhocf-dev.com/repository/runtimes-artifacts/org/kie/kogito/explainability-service/205.0.0/explainability-service-205.0.0-runner.jar
+    url: http://nexus3-tradisso-release-nexus.apps.playground.rhba.openshift-aws.rhocf-dev.com/repository/runtimes-artifacts-proxy/org/kie/kogito/explainability-service/205.0.0/explainability-service-205.0.0-runner.jar
     md5: aa51ee9e94b1d89aba61b31c4cdc89ba
 
 execute:
