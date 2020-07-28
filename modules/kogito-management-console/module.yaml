@@ -8,7 +8,7 @@ envs:
 
 artifacts:
   - name: kogito-management-console-runner.jar
-    url: http://nexus3-tradisso-release-nexus.apps.playground.rhba.openshift-aws.rhocf-dev.com/repository/runtimes-artifacts/org/kie/kogito/management-console/205.0.0/management-console-205.0.0-runner.jar
+    url: http://nexus3-tradisso-release-nexus.apps.playground.rhba.openshift-aws.rhocf-dev.com/repository/runtimes-artifacts-proxy/org/kie/kogito/management-console/205.0.0/management-console-205.0.0-runner.jar
     md5: 41e65598633bca43d143cfaa1db79a29
 
 execute:
