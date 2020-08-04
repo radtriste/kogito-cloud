@@ -19,7 +19,7 @@ import os
 import argparse
 
 DEFAULT_REPO_URL = "https://repository.jboss.org/nexus/content/groups/public/"
-DEFAULT_VERSION = "201.0.0"
+DEFAULT_VERSION = "201.0.1-snapshot"
 DEFAULT_ARTIFACT_PATH = "org/kie/kogito"
 
 Modules = {
