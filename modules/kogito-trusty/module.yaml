@@ -4,9 +4,8 @@ version: "201.0.0"
 
 artifacts:
   - name: kogito-trusty-runner.jar
-    url: https://repository.jboss.org/nexus/content/groups/public/org/kie/kogito/trusty-service/201.0.0/trusty-service-201.0.0-runner.jar
-    md5: "<html>\n  <head>\n    <title>404 - Path /org/kie/kogito/trusty-service/201.0.0/trusty-service-201.0.0-runner.jar.md5 not found in group repository &quot;Public Repository Group&quot; [id=public].</title>\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>\n\n    <link rel=\"icon\" type=\"image/png\" href=\"https://repository.jboss.org/nexus/favicon.png\">\n    <!--[if IE]>\n    <link rel=\"SHORTCUT ICON\" href=\"https://repository.jboss.org/nexus/favicon.ico\"/>\n    <![endif]-->\n\n    <link rel=\"stylesheet\" href=\"https://repository.jboss.org/nexus/static/css/Sonatype-content.css?2.14.18-01\" type=\"text/css\" media=\"screen\" title=\"no title\" charset=\"utf-8\">\n  </head>\n  <body>\n    <h1>404 - Path /org/kie/kogito/trusty-service/201.0.0/trusty-service-201.0.0-runner.jar.md5 not found in group repository &quot;Public Repository Group&quot; [id=public].</h1>\n    <p>Path /org/kie/kogito/trusty-service/201.0.0/trusty-service-201.0.0-runner.jar.md5 not found in group repository\
-      \ &quot;Public Repository Group&quot; [id=public].</p>\n  </body>\n</html>"
+    url: http://nexus3-tradisso-release-nexus.apps.playground.rhba.openshift-aws.rhocf-dev.com/repository/runtimes-artifacts/org/kie/kogito/trusty-service/201.0.0/trusty-service-201.0.0-runner.jar
+    md5: "12f8008c8a0e828e0b04bdae53f885b0"
 
 execute:
   - script: configure
