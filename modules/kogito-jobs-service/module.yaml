@@ -4,7 +4,7 @@ version: "206.0.0"
 
 artifacts:
   - name: kogito-jobs-service-runner.jar
-    url: http://nexus3-tradisso-release-nexus.apps.playground.rhba.openshift-aws.rhocf-dev.com/repository/runtimes-artifacts/org/kie/kogito/jobs-service/206.0.0/jobs-service-206.0.0-runner.jar
+    url: http://nexus3-tradisso-release-nexus.apps.playground.rhba.openshift-aws.rhocf-dev.com/repository/runtimes-artifacts-proxy/org/kie/kogito/jobs-service/206.0.0/jobs-service-206.0.0-runner.jar
     md5: 103a4eef84eaa5e8439748b23c60b484
 
 execute:
