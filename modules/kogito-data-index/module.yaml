@@ -4,7 +4,7 @@ version: "207.0.0"
 
 artifacts:
   - name: kogito-data-index-runner.jar
-    url: http://nexus3-tradisso-release-nexus.apps.playground.rhba.openshift-aws.rhocf-dev.com/repository/runtimes-artifacts/org/kie/kogito/data-index-service/207.0.0/data-index-service-207.0.0-runner.jar
+    url: http://nexus3-tradisso-release-nexus.apps.playground.rhba.openshift-aws.rhocf-dev.com/repository/runtimes-artifacts-proxy/org/kie/kogito/data-index-service/207.0.0/data-index-service-207.0.0-runner.jar
     md5: 22d5dea0483c74add88325eeb94fa8c0
 
 execute:
