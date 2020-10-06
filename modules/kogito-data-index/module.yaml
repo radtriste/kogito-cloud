@@ -1,14 +1,14 @@
 schema_version: 1
 name: org.kie.kogito.dataindex
-version: "1.0.0-snapshot"
+version: "401.0.0"
 
 artifacts:
   - name: data-index-service-infinispan.jar
-    url: https://repository.jboss.org/nexus/content/groups/public/org/kie/kogito/data-index-service-infinispan/1.0.0-SNAPSHOT/data-index-service-infinispan-1.0.0-20200831.024637-4-runner.jar
-    md5: 69f2d2fd634a02a70b8aa39b02786eca
+    url: http://nexus3-tradisso-release-nexus.apps.playground.rhba.openshift-psi.rhocf-dev.net/repository/kogito-test/org/kie/kogito/data-index-service-infinispan/401.0.0/data-index-service-infinispan-401.0.0-runner.jar
+    md5: 1e71d39388456d6bd8654b234c642c3f
   - name: data-index-service-mongodb.jar
-    url: https://repository.jboss.org/nexus/content/groups/public/org/kie/kogito/data-index-service-mongodb/1.0.0-SNAPSHOT/data-index-service-mongodb-1.0.0-20200831.024717-4-runner.jar
-    md5: b95b5f3a0567f24c96e9448aa53396fc
+    url: http://nexus3-tradisso-release-nexus.apps.playground.rhba.openshift-psi.rhocf-dev.net/repository/kogito-test/org/kie/kogito/data-index-service-mongodb/401.0.0/data-index-service-mongodb-401.0.0-runner.jar
+    md5: b685bf3df9fca9d1f23ffad5eba6cf70
 
 execute:
   - script: configure
