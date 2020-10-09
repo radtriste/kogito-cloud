@@ -1,14 +1,14 @@
 schema_version: 1
 name: org.kie.kogito.explainability
-version: "1.0.0-snapshot"
+version: "402.0.0"
 
 artifacts:
   - name: kogito-explainability-rest-runner.jar
-    url: https://repository.jboss.org/nexus/content/groups/public/org/kie/kogito/explainability-service-rest/1.0.0-SNAPSHOT/explainability-service-rest-1.0.0-20200831.025314-25-runner.jar
-    md5: 056d113d1e012599c77e3b174f0ce951
+    url: http://nexus3-tradisso-nexus.apps.playground.rhba.openshift-psi.rhocf-dev.net/repository/kogito-test/org/kie/kogito/explainability-service-rest/402.0.0/explainability-service-rest-402.0.0-runner.jar
+    md5: 328fc7bf6a4e3c630756463266fdfd5b
   - name: kogito-explainability-messaging-runner.jar
-    url: https://repository.jboss.org/nexus/content/groups/public/org/kie/kogito/explainability-service-messaging/1.0.0-SNAPSHOT/explainability-service-messaging-1.0.0-20200831.025251-25-runner.jar
-    md5: 631460787e31ad6276450ee981b9f243
+    url: http://nexus3-tradisso-nexus.apps.playground.rhba.openshift-psi.rhocf-dev.net/repository/kogito-test/org/kie/kogito/explainability-service-messaging/402.0.0/explainability-service-messaging-402.0.0-runner.jar
+    md5: a34e1b5fde935d7d9d834c2182ccc20e
 
 execute:
   - script: configure
