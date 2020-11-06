@@ -5,7 +5,7 @@ version: "999.0.0"
 artifacts:
   - name: kogito-jobs-service-runner.jar
     url: http://nexus3-tradisso-nexus.apps.kogito-cloud.hosted.psi.rdu2.redhat.com/repository/kogito-test/org/kie/kogito/jobs-service/999.0.0/jobs-service-999.0.0-runner.jar
-    md5: 89a881dcbf81334a8015a51d86751cce
+    md5: bd0ca27400ff63b47d53feec3f835776
 
 execute:
   - script: configure
