@@ -5,7 +5,7 @@ version: "999.0.1"
 artifacts:
   - name: data-index-service-infinispan.jar
     url: http://nexus3-tradisso-nexus.apps.kogito-cloud.hosted.psi.rdu2.redhat.com/repository/kogito-test/org/kie/kogito/data-index-service-infinispan/999.0.0/data-index-service-infinispan-999.0.0-runner.jar
-    md5: c6472ad10581ba298d01f47b45435a71
+    md5: 898bcf4f3f4880f96cf309fb1ef17376
 
 execute:
   - script: configure

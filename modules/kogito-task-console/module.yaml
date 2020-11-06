@@ -5,7 +5,7 @@ version: "999.0.1"
 artifacts:
   - name: kogito-task-console-runner.jar
     url: http://nexus3-tradisso-nexus.apps.kogito-cloud.hosted.psi.rdu2.redhat.com/repository/kogito-test/org/kie/kogito/task-console/999.0.0/task-console-999.0.0-runner.jar
-    md5: 7caa5792fdcb8a049c8aa3be84e277ff
+    md5: a37b578defe48ed57b0c995e08107793
 
 execute:
   - script: configure

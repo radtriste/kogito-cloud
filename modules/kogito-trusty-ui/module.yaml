@@ -5,7 +5,7 @@ version: "999.0.1"
 artifacts:
   - name: kogito-trusty-ui-runner.jar
     url: http://nexus3-tradisso-nexus.apps.kogito-cloud.hosted.psi.rdu2.redhat.com/repository/kogito-test/org/kie/kogito/trusty-ui/999.0.0/trusty-ui-999.0.0-runner.jar
-    md5: 35d03a05759d3a5bfee89d8922c97980
+    md5: 9dd8db0562a1f7dfa943e86a1b8b6a58
 
 execute:
   - script: configure

@@ -5,7 +5,7 @@ version: "999.0.1"
 artifacts:
   - name: data-index-service-mongodb.jar
     url: http://nexus3-tradisso-nexus.apps.kogito-cloud.hosted.psi.rdu2.redhat.com/repository/kogito-test/org/kie/kogito/data-index-service-mongodb/999.0.0/data-index-service-mongodb-999.0.0-runner.jar
-    md5: 887d9eaff0e1b1e8b8700d72721dedc3
+    md5: 790f1a482f7ea2aebdda575cc0f7ffaf
 
 execute:
   - script: configure
