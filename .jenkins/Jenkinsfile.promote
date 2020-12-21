@@ -361,7 +361,7 @@ String getGitTag() {
 }
 
 String getGitBranch() {
-    return env.GIT_BRANCH
+    return env.GIT_BRANCH_NAME
 }
 
 String getPRSourceBranch() {
