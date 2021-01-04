@@ -1,6 +1,6 @@
 schema_version: 1
 name: org.kie.kogito.quarkus.jvm
-version: "672.0.0"
+version: "662.0.0"
 
 execute:
   - script: configure

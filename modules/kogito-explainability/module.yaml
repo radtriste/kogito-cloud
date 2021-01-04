@@ -1,14 +1,14 @@
 schema_version: 1
 name: org.kie.kogito.explainability
-version: "672.0.0"
+version: "662.0.0"
 
 artifacts:
   - name: kogito-explainability-rest-runner.jar
-    url: http://nexus3-tradisso-nexus.apps.kogito-cloud.hosted.psi.rdu2.redhat.com/repository/kogito-test/org/kie/kogito/explainability-service-rest/672.0.0.Final/explainability-service-rest-672.0.0.Final-runner.jar
-    md5: 19bcaf8173b8a8e13e9ec1caf693b2d1
+    url: http://nexus3-tradisso-nexus.apps.kogito-cloud.hosted.psi.rdu2.redhat.com/repository/kogito-test/org/kie/kogito/explainability-service-rest/662.0.0.Final/explainability-service-rest-662.0.0.Final-runner.jar
+    md5: 285d9385d80df6476025b115cc70d2c3
   - name: kogito-explainability-messaging-runner.jar
-    url: http://nexus3-tradisso-nexus.apps.kogito-cloud.hosted.psi.rdu2.redhat.com/repository/kogito-test/org/kie/kogito/explainability-service-messaging/672.0.0.Final/explainability-service-messaging-672.0.0.Final-runner.jar
-    md5: 997eba3f65f35c2fd2f04d5a11d40215
+    url: http://nexus3-tradisso-nexus.apps.kogito-cloud.hosted.psi.rdu2.redhat.com/repository/kogito-test/org/kie/kogito/explainability-service-messaging/662.0.0.Final/explainability-service-messaging-662.0.0.Final-runner.jar
+    md5: 7e9858c04f25f051412f35efae0c5842
 
 execute:
   - script: configure
