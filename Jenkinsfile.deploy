@@ -466,7 +466,7 @@ String getGitAuthor() {
 }
 
 String getBotBranch() {
-    return "${getProjectVersion() ?: getBuildBranch()}-${env.BOT_BRANCH_HASH}"
+    return "${getProjectVersion() ?: getGitBranch()}-${env.BOT_BRANCH_HASH}"
 }
 
 String getBotAuthor() {
