@@ -1,11 +1,11 @@
 schema_version: 1
 name: org.kie.kogito.management.console
-version: "1.5.1-snapshot"
+version: "250.1.0"
 
 artifacts:
   - name: kogito-management-console-runner.jar
-    url: https://repository.jboss.org/nexus/content/groups/public/org/kie/kogito/management-console/1.5.1-SNAPSHOT/management-console-1.5.1-20210420.033154-6-runner.jar
-    md5: 3ede06aee6953cec1876b0421fa3a9fd
+    url: http://nexus3-tradisso-nexus.apps.kogito-cloud.hosted.psi.rdu2.redhat.com/repository/kogito-test/org/kie/kogito/management-console/250.1.0/management-console-250.1.0-runner.jar
+    md5: 004e8ac923b12cd6c97fb3d2e115f175
 
 execute:
   - script: configure
