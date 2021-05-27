@@ -339,6 +339,9 @@ void launchParallelForEachImage(stageNamePrefix, executeOnImage) {
 void buildImage(image) {
     try {
         echo "make build-image image_name=${image} ignore_test=true cekit_option='--work-dir .'"
+        if (image == 'kogito-builder') {
+            error 'forced error'
+        }
         registerBuiltImage (image)
     } catch(err) {
         unstable("${image} build failed")
