@@ -221,42 +221,42 @@ pipeline {
                 }
             }
         }
-        stage('Tagging') {
-            steps {
-                script {
-                    tagImages()
-                }
-            }
-        }
-        stage('Pushing') {
-            steps {
-                script {
-                    if (isDeployImageInOpenshiftRegistry()) {
-                        loginOpenshiftRegistry()
-                    } else if (getDeployImageRegistryCredentials()) {
-                        loginContainerRegistry(getDeployImageRegistry(), getDeployImageRegistryCredentials())
-                    }
-                    pushImages()
+        // stage('Tagging') {
+        //     steps {
+        //         script {
+        //             tagImages()
+        //         }
+        //     }
+        // }
+        // stage('Pushing') {
+        //     steps {
+        //         script {
+        //             if (isDeployImageInOpenshiftRegistry()) {
+        //                 loginOpenshiftRegistry()
+        //             } else if (getDeployImageRegistryCredentials()) {
+        //                 loginContainerRegistry(getDeployImageRegistry(), getDeployImageRegistryCredentials())
+        //             }
+        //             pushImages()
 
-                    if (isQuayRegistry()) {
-                        makeQuayImagesPublic()
-                    }
-                }
-            }
-            post {
-                always {
-                    script {
-                        // Store image deployment information
-                        String imgPrefix = "${getRepoName()}.image"
-                        setDeployPropertyIfNeeded("${imgPrefix}.registry", getDeployImageRegistry())
-                        setDeployPropertyIfNeeded("${imgPrefix}.namespace", getDeployImageNamespace())
-                        setDeployPropertyIfNeeded("${imgPrefix}.names", getBuiltImages().join(','))
-                        setDeployPropertyIfNeeded("${imgPrefix}.name-suffix", getDeployImageNameSuffix())
-                        setDeployPropertyIfNeeded("${imgPrefix}.tag", getDeployImageTag())
-                    }
-                }
-            }
-        }
+        //             if (isQuayRegistry()) {
+        //                 makeQuayImagesPublic()
+        //             }
+        //         }
+        //     }
+        //     post {
+        //         always {
+        //             script {
+        //                 // Store image deployment information
+        //                 String imgPrefix = "${getRepoName()}.image"
+        //                 setDeployPropertyIfNeeded("${imgPrefix}.registry", getDeployImageRegistry())
+        //                 setDeployPropertyIfNeeded("${imgPrefix}.namespace", getDeployImageNamespace())
+        //                 setDeployPropertyIfNeeded("${imgPrefix}.names", getBuiltImages().join(','))
+        //                 setDeployPropertyIfNeeded("${imgPrefix}.name-suffix", getDeployImageNameSuffix())
+        //                 setDeployPropertyIfNeeded("${imgPrefix}.tag", getDeployImageTag())
+        //             }
+        //         }
+        //     }
+        // }
         stage('Create PR') {
             when {
                 expression {
@@ -355,7 +355,10 @@ void launchParallelForEachImage(stageNamePrefix, executeOnImage) {
 
 void buildImage(image) {
     try {
-        sh "make build-image image_name=${image} ignore_test=true cekit_option='--work-dir .'"
+        echo "make build-image image_name=${image} ignore_test=true cekit_option='--work-dir .'"
+        if(image == 'kogito-builder') {
+            error 'This is builder error'
+        }
         registerBuiltImage(image)
     } catch (err) {
         registerFailedImage(image)
@@ -365,7 +368,10 @@ void buildImage(image) {
 
 void testImage(image) {
     try {
-        sh "make build-image image_name=${image} ignore_build=true cekit_option='--work-dir .'"
+        echo "make build-image image_name=${image} ignore_build=true cekit_option='--work-dir .'"
+        if(image == 'kogito-runtime-jvm') {
+            error 'This is runtime error'
+        }
     } catch (err) {
         removeBuiltImage (image)
         registerFailedImage(image)
