@@ -121,9 +121,6 @@ def update_artifacts(service, modulePath):
     :param modulePath: relative file location of the module.yaml for the kogito service
     """
 
-    if service['name'] == "data-index-service-infinispan":
-        raise RuntimeError('Expected error on data-index-service-infinispan')
-
     with open(modulePath) as module:
         data = common.yaml_loader().load(module)
         # print(service)
